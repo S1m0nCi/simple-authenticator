@@ -1,9 +1,8 @@
 import 
 
 class Token {
-  constructor(type, value) {
+  constructor(type) {
     this.type = type;
-    this.value = value;
   }
 
   getValue() {

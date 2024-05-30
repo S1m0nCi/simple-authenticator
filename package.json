@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "simple-authentication-api",
   "version": "1.0.0",
   "description": "A simple API for authentication using javascript for small in-development apps",
@@ -15,6 +16,7 @@
   "dependencies": {
     "argon2": "^0.40.3",
     "body-parser": "^1.20.2",
+    "crypto": "^1.0.1",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "latest": "^0.2.0"

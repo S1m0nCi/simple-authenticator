@@ -1,12 +1,6 @@
-import express, { Router } from "express";
-import bodyParser from "body-parser";
+import { randomBytes } from "crypto";
 
-import { authenticationRouter } from "./routes/authentication";
-
-const app = express();
-const router = Router();
-const port = 3000;
-
+console.log(randomBytes(839).toString('hex'))
 
 
 
