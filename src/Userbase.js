@@ -24,8 +24,13 @@ class UserBase {
   }
 
   // configure authentication settings
-  constructor(settings=UserBase.defaultSettings) {
+  constructor(settings=UserBase.defaultSettings, users={}) {
     this.settings = settings;
+    this.users = users
+  }
+
+  addUser(username, hashedPassword) {
+    this.users.username = {password: hashedPassword}
   }
 
 

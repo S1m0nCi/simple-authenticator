@@ -27,9 +27,12 @@ class User {
     return this.username;
   }
   
-  signUp(password) {
+  async signUp(password) {
     this.password = hash(password);
-    // store user in a database
+    await this.setUserTokens();
+    // store user and password in a database. How do we or the user do this?
+    // for now, we can use an object or a file: just to ensure that everything works.
+    this.userBase.addUser(this.username, this.password);
   }
 
   // will need jwt tokens
@@ -37,9 +40,9 @@ class User {
     this.username = newUsername;
   }
 
-  // may not work because user is allowed to set the username
-  async authenticateUser(password, callback) {
-    const authenticated = await verify(this.password, password)
+  // may not work because user is allowed to set the username and the password
+  async authenticateUser(username, password, callback) {
+    const authenticated = await verify(this.userBase.users[username].password, password)
     if (authenticated) {
       // generate and store jwt tokens in this class
       // we need an object will all three user tokens
@@ -49,14 +52,29 @@ class User {
       callback(new Error("Invalid password"), null)
     } 
   }
+  // do we return the callback or not? no, we should just need to call it: it is the user's job to define the callback function to return or not.
 
-  async forgotPassword(oldPassword, newPassword, callback) {
-    const authenticated = await verify(this.password, oldPassword)
-    if (authenticated) {
-      this.password = hash(newPassword)
-      callback(null, "Password reset successfully")
+  // create a sign in function that calls authenticate user, for dev ease and to look more deeply at databases
+  async signIn(username, password, callback) {
+    if (username in this.userBase.users) {
+      return await this.authenticateUser(username, password, (err, result) => {
+        if (err) {
+          return err;
+        } 
+        return result;
+      })
     } else {
-      callback(new Error("Invalid password"), null)
+      callback("user does not exist", null)
+    }
+  }
+ 
+  async forgotPassword(oldPassword, newPassword, callback) {
+    const authenticated = await verify(this.password, oldPassword);
+    if (authenticated) {
+      this.password = hash(newPassword);
+      callback(null, "Password reset successfully");
+    } else {
+      callback(new Error("Invalid password"), null);
     }
   }
 
@@ -67,7 +85,7 @@ class User {
       access: await AccessToken(this.userBase.settings.access_exp),
       id: await IdToken(this.username, this.userBase.settings.id_exp),
       refresh: await RefreshToken(this.userBase.setting.refresh_exp)
-    }
+    };
   }
   
   async refreshUserTokens(userRefreshToken) {
