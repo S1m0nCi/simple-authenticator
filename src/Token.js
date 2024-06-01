@@ -1,12 +1,21 @@
-import 
+import { verify } from "jsonwebtoken"
 
-class Token {
-  constructor(type) {
-    this.type = type;
+class Token {  
+  constructor(token, userBase) {
+    this.token = token;
+    this.userBase = userBase;
   }
 
-  getValue() {
-    return this.value;
+  getToken() {
+    return this.token;
+  }
+
+  verify() {
+    return verify(this.token, process.env.SECRET_KEY, (err, result) => {
+      if (err) {
+        return false;
+      } 
+    })
   }
 
 

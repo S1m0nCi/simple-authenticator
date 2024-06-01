@@ -11,10 +11,16 @@ Features:
 
 import { hash, verify } from "argon2";
 
+import UserBase from "UserBase.js";
+import AccessToken from "AccessToken.js";
+import IdToken from "IdToken.js";
+import RefreshToken from "RefreshToken.js";
+
 class User {
 
-  constructor(username) {
+  constructor(username, userBase) {
     this.username = username; 
+    this.userBase = userBase;
   }
 
   getUsername() {
@@ -27,29 +33,66 @@ class User {
   }
 
   // will need jwt tokens
-  changeUsername(username) {
-    this.username = username;
+  changeUsername(newUsername) {
+    this.username = newUsername;
   }
 
   // may not work because user is allowed to set the username
-  async authenticateUser(username, password, callback) {
-    if (username == this.username) {
-      const authenticated = await verify(this.password, password)
+  async authenticateUser(password, callback) {
+    const authenticated = await verify(this.password, password)
     if (authenticated) {
-      callback(null, {username: this.username})
+      // generate and store jwt tokens in this class
+      // we need an object will all three user tokens
+      await this.setUserTokens()
+      callback(null, this.username)
     } else {
       callback(new Error("Invalid password"), null)
-    }
-    }
+    } 
   }
 
-  async changePassword(oldPassword, newPassword, callback) {
+  async forgotPassword(oldPassword, newPassword, callback) {
     const authenticated = await verify(this.password, oldPassword)
     if (authenticated) {
       this.password = hash(newPassword)
-      callback(null)
+      callback(null, "Password reset successfully")
     } else {
-      callback(new Error("Invalid password"))
+      callback(new Error("Invalid password"), null)
+    }
+  }
+
+
+  // create a function to store user tokens, may be static
+  async setUserTokens() {
+    this.userTokens = {
+      access: await AccessToken(this.userBase.settings.access_exp),
+      id: await IdToken(this.username, this.userBase.settings.id_exp),
+      refresh: await RefreshToken(this.userBase.setting.refresh_exp)
+    }
+  }
+  
+  async refreshUserTokens(userRefreshToken) {
+    this.userTokens = {
+      access: await AccessToken(this.userBase.settings.access_exp),
+      id: await IdToken(this.username, this.userBase.settings.id_exp),
+      refresh: userRefreshToken
+    }
+  }
+
+  // create a function to check all jwt tokens
+  // we will need to store the user tokens though: a session, in the user class
+  async authenticateUserTokens() {
+    // first check access and id tokens
+    if (this.userTokens.access.verify() && this.userTokens.access.verify()) {
+      return true;
+    } else {
+      if (this.userTokens.refresh.verify()) {
+        // refresh the tokens
+        this.refreshUserTokens(this.userTokens.refresh);
+        return true;
+      } else {
+        return false;
+        // then the user will have to be re-authenticated with a password flow
+      }
     }
   }
   

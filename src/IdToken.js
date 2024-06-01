@@ -4,10 +4,20 @@ import Token from "./Token.js"
 
 
 class IdToken extends Token {
-  
-  constructor() {
-    super("id")
-    this.value = jwt.sign({"username": username}, process.env.SECRET_KEY)
 
+  constructor(username, exp) {
+    const token = jwt.sign(
+      {
+        "typ":"id",
+        "username": username,
+      },
+      process.env.SECRET_KEY,
+      {
+        expiresIn: exp,
+      }
+    )
+    this.username = username
+    super(token)
   }
+ 
 }
