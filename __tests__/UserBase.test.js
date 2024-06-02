@@ -1,6 +1,6 @@
 //const { test, expect } = require("jest");
 
-const { UserBase } =  require("../src/UserBase.js");
+const { UserBase } =  require("../src/UserBases.js");
 
 // first trial test: 
 test("Default Userbase should be created", () => {
