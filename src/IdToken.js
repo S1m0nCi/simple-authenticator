@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 
-const Token = require("./Token.js");
+const { Token } = require("./Token.js");
 
 
 class IdToken extends Token {

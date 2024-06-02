@@ -11,10 +11,10 @@ Features:
 
 const { hash, verify } =  require("argon2");
 
-const UserBase = require("UserBase.js");
-const AccessToken = require("AccessToken.js");
-const IdToken = require("IdToken.js");
-const RefreshToken = require("RefreshToken.js");
+const { UserBase } = require("./UserBase.js");
+const { AccessToken } = require("./AccessToken.js");
+const { IdToken } = require("./IdToken.js");
+const { RefreshToken } = require("./RefreshToken.js");
 
 class User {
 
