@@ -1,6 +1,6 @@
-import jwt from "jsonwebtoken"
+const jwt = require("jsonwebtoken");
 
-import Token from "./Token.js"
+const Token = require("./Token.js");
 
 class RefreshToken extends Token {
 
@@ -17,3 +17,5 @@ class RefreshToken extends Token {
     super(token)
   }
 }
+
+module.exports = { RefreshToken };

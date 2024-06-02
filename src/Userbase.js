@@ -11,7 +11,7 @@ idexp
 refreshexp
 */
 
-import { randomBytes } from "crypto";
+const { randomBytes } = require("crypto");
 
 class UserBase {
 
@@ -35,3 +35,5 @@ class UserBase {
 
 
 }
+
+module.exports = { UserBase };
