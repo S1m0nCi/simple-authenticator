@@ -1,4 +1,4 @@
-const jwt = require("jsonwebtoken");
+import jwt from "jsonwebtoken";
 
 const Token = require("./Token")
 
@@ -19,6 +19,5 @@ class AccessToken extends Token {
   getToken() {
     return this.token;
   }
-}
 
-module.exports = { AccessToken };
+}

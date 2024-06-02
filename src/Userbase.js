@@ -37,3 +37,4 @@ class UserBase {
 }
 
 module.exports = { UserBase };
+
