@@ -21,3 +21,5 @@ class AccessToken extends Token {
   }
 
 }
+
+module.exports = { AccessToken }
