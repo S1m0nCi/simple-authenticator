@@ -1,6 +1,6 @@
-import jwt from "jsonwebtoken"
+const jwt = require("jsonwebtoken");
 
-import Token from "./Token.js"
+const Token = require("./Token.js");
 
 
 class IdToken extends Token {
@@ -21,3 +21,5 @@ class IdToken extends Token {
   }
  
 }
+
+export default IdToken;

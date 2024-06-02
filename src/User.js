@@ -9,12 +9,12 @@ Features:
 // need to implement a database
 // for now, leave the database implementation to the library user
 
-import { hash, verify } from "argon2";
+const { hash, verify } =  require("argon2");
 
-import UserBase from "UserBase.js";
-import AccessToken from "AccessToken.js";
-import IdToken from "IdToken.js";
-import RefreshToken from "RefreshToken.js";
+const UserBase = require("UserBase.js");
+const AccessToken = require("AccessToken.js");
+const IdToken = require("IdToken.js");
+const RefreshToken = require("RefreshToken.js");
 
 class User {
 
@@ -117,3 +117,5 @@ class User {
 
   
 }
+
+export default User;

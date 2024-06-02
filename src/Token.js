@@ -1,4 +1,4 @@
-import { verify } from "jsonwebtoken"
+const { verify } = require("jsonwebtoken");
 
 class Token {  
   constructor(token, userBase) {
@@ -20,3 +20,5 @@ class Token {
 
 
 }
+
+export default Token;
