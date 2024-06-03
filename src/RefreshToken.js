@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+require("dotenv").config()
 
 const { Token } = require("./Token.js");
 
@@ -9,7 +10,7 @@ class RefreshToken extends Token {
       {
         "typ": "refresh"
       },
-      secretOrPrivateKey=process.env.SECRET_KEY,
+      process.env.SECRET_KEY,
       {
         expiresIn: exp,
       }

@@ -20,10 +20,14 @@ test("Default Userbase should be created", () => {
 
 test("User should be added", async () => {
   const userBase = new UserBase();
-  const username = "first_user";
+  const username = "user1";
   const testPassword = randomBytes(8).toString("hex");
   const hashedPassword = await hash(testPassword);
-  userBase.addUser(username, hashedPassword);
+  userBase.addUser(username, hashedPassword, (err, result) => {
+    if (err) {
+      return err
+    }
+  });
   expect(userBase.users[username]);
   expect(await verify(userBase.getUsers()[username].password, testPassword)).toBe(true);
 })

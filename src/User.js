@@ -28,16 +28,28 @@ class User {
   }
   
   async signUp(password) {
-    this.password = hash(password);
+    this.password = await hash(password);
     await this.setUserTokens();
     // store user and password in a database. How do we or the user do this?
     // for now, we can use an object or a file: just to ensure that everything works.
-    this.userBase.addUser(this.username, this.password);
+    this.userBase.addUser(this.username, this.password, (err, result) => {
+      if (err) {
+        return err;
+      } else {
+        return result;
+      }
+    });
   }
 
   // will need jwt tokens
-  changeUsername(newUsername) {
-    this.username = newUsername;
+  changeUsername(newUsername, callback) {
+    const authorised = this.authenticateUserTokens();
+    if (authorised) {
+      this.username = newUsername;
+      callback(null, "username changed successfully");
+    } else {
+      callback("user not authorised", null)
+    }
   }
 
   // may not work because user is allowed to set the username and the password
@@ -82,9 +94,9 @@ class User {
   // create a function to store user tokens, may be static
   async setUserTokens() {
     this.userTokens = {
-      access: await AccessToken(this.userBase.settings.access_exp),
-      id: await IdToken(this.username, this.userBase.settings.id_exp),
-      refresh: await RefreshToken(this.userBase.setting.refresh_exp)
+      access: new AccessToken(this.userBase.settings.access_exp),
+      id: new IdToken(this.username, this.userBase.settings.id_exp),
+      refresh: new RefreshToken(this.userBase.settings.refresh_exp)
     };
   }
   
@@ -113,9 +125,6 @@ class User {
       }
     }
   }
-  
-
-  
 }
 
 module.exports = { User };

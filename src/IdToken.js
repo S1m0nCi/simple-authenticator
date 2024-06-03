@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+require("dotenv").config()
 
 const { Token } = require("./Token.js");
 
@@ -15,9 +16,9 @@ class IdToken extends Token {
       {
         expiresIn: exp,
       }
-    )
-    this.username = username
-    super(token)
+    );
+    super(token);
+    this.username = username;
   }
  
 }

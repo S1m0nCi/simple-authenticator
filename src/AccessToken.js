@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+require("dotenv").config()
 
 const { Token } = require("./Token")
 
@@ -14,10 +15,6 @@ class AccessToken extends Token {
       }
     )
     super(token)
-  }
-
-  getToken() {
-    return this.token;
   }
 }
 
