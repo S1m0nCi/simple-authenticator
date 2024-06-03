@@ -26,14 +26,18 @@ class UserBase {
   // configure authentication settings
   constructor(settings=UserBase.defaultSettings, users={}) {
     this.settings = settings;
-    this.users = users
+    this.users = users;
+  }
+
+  getUsers() {
+    return this.users;
   }
 
   addUser(username, hashedPassword) {
-    this.users.username = {password: hashedPassword}
+    if (!(username in this.users)) {
+      this.users[username] = {password: hashedPassword};
+    }
   }
-
-
 }
 
 module.exports = { UserBase };

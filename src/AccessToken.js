@@ -19,7 +19,6 @@ class AccessToken extends Token {
   getToken() {
     return this.token;
   }
-
 }
 
 module.exports = { AccessToken }
