@@ -71,9 +71,9 @@ class User {
     if (username in this.userBase.users) {
       return await this.authenticateUser(username, password, (err, result) => {
         if (err) {
-          return err;
+          callback(err, null);
         } 
-        return result;
+        callback(null, "user signed in");
       })
     } else {
       callback("user does not exist", null)
@@ -83,13 +83,27 @@ class User {
   async forgotPassword(oldPassword, newPassword, callback) {
     const authenticated = await verify(this.password, oldPassword);
     if (authenticated) {
-      this.password = hash(newPassword);
+      this.password = await hash(newPassword);
       callback(null, "Password reset successfully");
     } else {
       callback(new Error("Invalid password"), null);
     }
   }
 
+  async changePassword(oldPassword, newPassword, callback) {
+    const authorised = this.authenticateUserTokens();
+    if (authorised) {
+      authenticated = verify(this.password, oldPassword);
+      if (authenticated) {
+        this.password = newPassword;
+        callback(null, "password changed successfully");
+      } else {
+        callback("password incorrect", null);
+      }
+    } else {
+      callback("user not signed in", null);
+    }
+  }
 
   // create a function to store user tokens, may be static
   async setUserTokens() {
@@ -100,6 +114,7 @@ class User {
     };
   }
   
+  // INTERNAL USE ONLY
   async refreshUserTokens(userRefreshToken) {
     this.userTokens = {
       access: await AccessToken(this.userBase.settings.access_exp),
@@ -110,17 +125,17 @@ class User {
 
   // create a function to check all jwt tokens
   // we will need to store the user tokens though: a session, in the user class
-  async authenticateUserTokens() {
+  async authenticateUserTokens(callback) {
     // first check access and id tokens
-    if (this.userTokens.access.verify() && this.userTokens.access.verify()) {
-      return true;
+    if (this.userTokens.access.verifyToken() && this.userTokens.access.verifyToken()) {
+      return callback(null, "short-lived tokens valid");
     } else {
-      if (this.userTokens.refresh.verify()) {
+      if (this.userTokens.refresh.verifyToken()) {
         // refresh the tokens
         this.refreshUserTokens(this.userTokens.refresh);
-        return true;
+        return callback(null, "tokens refreshed");
       } else {
-        return false;
+        return callback("tokens invalid", null);
         // then the user will have to be re-authenticated with a password flow
       }
     }

@@ -10,11 +10,12 @@ class Token {
     return this.token;
   }
 
-  verify() {
+  verifyToken() {
     return verify(this.token, process.env.SECRET_KEY, (err, result) => {
       if (err) {
         return false;
       } 
+      return true;      
     })
   }
 }
