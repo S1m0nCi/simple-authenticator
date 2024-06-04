@@ -41,9 +41,12 @@ class User {
     });
   }
 
-  // will need jwt tokens
-  changeUsername(newUsername, callback) {
-    const authorised = this.authenticateUserTokens();
+  async changeUsername(newUsername, callback) {
+    const authorised = await this.authenticateUserTokens((err, result) => {
+      if (err) {
+        return err
+      }
+    });
     if (authorised) {
       this.username = newUsername;
       callback(null, "username changed successfully");
@@ -52,7 +55,6 @@ class User {
     }
   }
 
-  // may not work because user is allowed to set the username and the password
   async authenticateUser(username, password, callback) {
     const authenticated = await verify(this.userBase.users[username].password, password)
     if (authenticated) {
@@ -91,7 +93,11 @@ class User {
   }
 
   async changePassword(oldPassword, newPassword, callback) {
-    const authorised = this.authenticateUserTokens();
+    const authorised = await this.authenticateUserTokens((err, result) => {
+      if (err) {
+        return err;
+      }
+    });
     if (authorised) {
       authenticated = verify(this.password, oldPassword);
       if (authenticated) {
@@ -117,8 +123,8 @@ class User {
   // INTERNAL USE ONLY
   async refreshUserTokens(userRefreshToken) {
     this.userTokens = {
-      access: await AccessToken(this.userBase.settings.access_exp),
-      id: await IdToken(this.username, this.userBase.settings.id_exp),
+      access: new AccessToken(this.userBase.settings.access_exp),
+      id: new IdToken(this.username, this.userBase.settings.id_exp),
       refresh: userRefreshToken
     }
   }
@@ -128,14 +134,14 @@ class User {
   async authenticateUserTokens(callback) {
     // first check access and id tokens
     if (this.userTokens.access.verifyToken() && this.userTokens.access.verifyToken()) {
-      return callback(null, "short-lived tokens valid");
+      callback(null, "short-lived tokens valid");
     } else {
       if (this.userTokens.refresh.verifyToken()) {
         // refresh the tokens
         this.refreshUserTokens(this.userTokens.refresh);
-        return callback(null, "tokens refreshed");
+        callback(null, "tokens refreshed");
       } else {
-        return callback("tokens invalid", null);
+        callback("tokens invalid", null);
         // then the user will have to be re-authenticated with a password flow
       }
     }

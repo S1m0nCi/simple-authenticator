@@ -38,11 +38,12 @@ test("Sign in", async () => {
   })
 })
 
-test("Verify tokens", async () => {
+test("Verify tokens and change password", async () => {
   const userBase = new UserBase();
   const username = "user5"
   const user = new User(username, userBase);
   const testPassword = randomBytes(8).toString("hex");
+  const newTestPassword = randomBytes(8).toString("hex");
   await user.signUp(testPassword);
   const tokensBefore = user.userTokens;
   await user.authenticateUserTokens((err, result) => {
@@ -50,7 +51,33 @@ test("Verify tokens", async () => {
       return err;
     }
     expect(result).toBe("short-lived tokens valid");
-    console.log(user.userTokens);
     expect(user.userTokens.access.getToken()).toBe(tokensBefore.access.getToken());
   });
+  await user.changeUsername("newUsername", (err, result) => {
+    if (err) {
+      return (err);
+    } 
+    expect(user.username).toBe("newUsername");
+  });
+  await user.changePassword(testPassword, newTestPassword, async (err, result) => {
+    if (err) {
+      return (err);
+    }
+    expect(await verify(userBase.getUsers()[username].password, newTestPassword)).toBe(true);
+  })
+})
+
+test("Refresh tokens", async () => {
+  const userBase = new UserBase();
+  const user = new User('refresh_user', userBase);
+  const testPassword = randomBytes(8).toString("hex");
+  await user.signUp(testPassword);
+  const tokensBefore = user.userTokens;
+  if (user.userTokens.refresh.verifyToken()) {
+    user.refreshUserTokens(user.userTokens.refresh);
+  }
+  expect(user.userTokens.refresh).toBe(tokensBefore.refresh);
+  expect(user.userTokens.access).not.toBe(tokensBefore.access);
+  expect(user.userTokens.id).not.toBe(tokensBefore.id);
+
 })

@@ -31,4 +31,3 @@ test("User should be added", async () => {
   expect(userBase.users[username]);
   expect(await verify(userBase.getUsers()[username].password, testPassword)).toBe(true);
 })
-
