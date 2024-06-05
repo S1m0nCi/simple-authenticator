@@ -28,14 +28,13 @@ test("Sign in", async () => {
   const username = "user4"
   const user = new User(username, userBase);
   const testPassword = randomBytes(8).toString("hex");
-  await user.signUp(testPassword);
-  await user.signIn(username, testPassword, (err, result) => {
-    if (err) {
-      return err
-    } else {
-      expect(result).toBe("user signed in")
-    }
-  })
+  try {
+    await user.signUp(testPassword);
+    var result = await user.signIn(username, testPassword)
+  } catch (error) {
+    return (error);
+  }
+  expect(result).toBe(user.getUserTokens());
 })
 
 test("Verify tokens and change password", async () => {
@@ -44,34 +43,30 @@ test("Verify tokens and change password", async () => {
   const user = new User(username, userBase);
   const testPassword = randomBytes(8).toString("hex");
   const newTestPassword = randomBytes(8).toString("hex");
-  await user.signUp(testPassword);
-  const tokensBefore = user.userTokens;
-  await user.authenticateUserTokens((err, result) => {
-    if (err) {
-      return err;
-    }
+  try {
+    await user.signUp(testPassword);
+    const tokensBefore = user.userTokens;
+    var result = await user.authenticateUserTokens();
     expect(result).toBe("short-lived tokens valid");
     expect(user.userTokens.access.getToken()).toBe(tokensBefore.access.getToken());
-  });
-  await user.changeUsername("newUsername", (err, result) => {
-    if (err) {
-      return (err);
-    } 
+    await user.changeUsername("newUsername");
     expect(user.username).toBe("newUsername");
-  });
-  await user.changePassword(testPassword, newTestPassword, async (err, result) => {
-    if (err) {
-      return (err);
-    }
-    expect(await verify(userBase.getUsers()[username].password, newTestPassword)).toBe(true);
-  })
+    await user.changePassword(testPassword, newTestPassword);
+    expect(await verify(userBase.getUsers()[username].password, newTestPassword)).toBe(true); 
+  } catch (error) {
+    return (error);
+  }
 })
 
 test("Refresh tokens", async () => {
   const userBase = new UserBase();
   const user = new User('refresh_user', userBase);
   const testPassword = randomBytes(8).toString("hex");
-  await user.signUp(testPassword);
+  try {
+    await user.signUp(testPassword);
+  } catch (error) {
+    return error;
+  }
   const tokensBefore = user.userTokens;
   if (user.userTokens.refresh.verifyToken()) {
     user.refreshUserTokens(user.userTokens.refresh);
@@ -79,5 +74,4 @@ test("Refresh tokens", async () => {
   expect(user.userTokens.refresh).toBe(tokensBefore.refresh);
   expect(user.userTokens.access).not.toBe(tokensBefore.access);
   expect(user.userTokens.id).not.toBe(tokensBefore.id);
-
 })

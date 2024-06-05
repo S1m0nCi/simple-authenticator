@@ -33,12 +33,12 @@ class UserBase {
     return this.users;
   }
 
-  addUser(username, hashedPassword, callback) {
+  addUser(username, hashedPassword) {
     if (!(username in this.users)) {
       this.users[username] = {password: hashedPassword};
-      callback(null, "user added successfully");
+      return "User Added successfully"
     } else {
-      callback("username not available", null);
+      throw new Error("username not available");
     }
   }
 }
