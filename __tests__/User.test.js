@@ -5,6 +5,8 @@ const { User } = require("../src/User.js");
 const { UserBase } = require("../src/UserBase.js");
 // we will only use the users.json file in our tests to imitate the user's use of a database or similar
 
+// also test negative cases
+
 test("User created", () => {
   const userBase = new UserBase();
   const username = "user2";
@@ -74,4 +76,41 @@ test("Refresh tokens", async () => {
   expect(user.userTokens.refresh).toBe(tokensBefore.refresh);
   expect(user.userTokens.access).not.toBe(tokensBefore.access);
   expect(user.userTokens.id).not.toBe(tokensBefore.id);
+})
+
+test("Expect access denied", async () => {
+  console.log("******************************************************");
+  const userBase = new UserBase();
+  const username = "deny_user"
+  const user = new User(username, userBase);
+  const testPassword = randomBytes(8).toString("hex");
+  const newPassword = randomBytes(8).toString("hex"); 
+  // do not sign user up
+  // or in fact we could sign user up and give fake tokens.
+  try {
+    await user.changeUsername("deny_user_2");
+  } catch (error) {
+    expect(error);
+  }
+  try {
+    user.signUp(testPassword);
+    user.userTokens = {
+      access: randomBytes(10).toString("hex"),
+      id: randomBytes(10).toString("hex"),
+      refresh: randomBytes(10).toString("hex"),
+    }; 
+  } catch (error) {
+    return error;
+  }
+  try {
+    await user.changePassword(testPassword, newPassword);
+  } catch (error) {
+    expect(error);
+  }
+  try {
+    await user.changeUsername("deny_user_3");
+  } catch (error) {
+    expect(error);
+  }
+  expect(user.username).toBe(username);
 })

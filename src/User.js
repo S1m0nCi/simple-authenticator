@@ -43,6 +43,10 @@ class User {
     try {
       await this.authenticateUserTokens();
       this.username = newUsername;
+      // change username in userBase.users object also
+      const { username, ...otherUsers} = this.userBase.users;
+      this.userBase.users = otherUsers;
+      this.userBase.addUser(this.username, this.password);
       return "username changed successfully"; 
     } catch (error) {
       throw new Error(error);
@@ -79,6 +83,10 @@ class User {
     try {
       await verify(this.password, oldPassword);
       this.password = await hash(newPassword);
+      // change password in userBase.users object also
+      const { username, ...otherUsers} = this.userBase.users;
+      this.userBase.users = otherUsers;
+      this.userBase.addUser(this.username, this.password);
       return "Password reset successfully";
     } catch (error) {
       throw new Error(error);
@@ -90,6 +98,10 @@ class User {
       await this.authenticateUserTokens();
       await verify(this.password, oldPassword);
       this.password = newPassword;
+      // change password in userBase.users object also
+      const { username, ...otherUsers} = this.userBase.users;
+      this.userBase.users = otherUsers;
+      this.userBase.addUser(this.username, this.password);
       return "Password changed successfully";
     } catch (error) {
       throw new Error(error);
@@ -122,16 +134,17 @@ class User {
   // we will need to store the user tokens though: a session, in the user class
   async authenticateUserTokens() {
     // first check access and id tokens
-    if (this.userTokens.access.verifyToken() && this.userTokens.access.verifyToken()) {
+    try {
+      this.userTokens.access.verifyToken();
+      this.userTokens.id.verifyToken();
       return "short-lived tokens valid";
-    } else {
-      if (this.userTokens.refresh.verifyToken()) {
-        // refresh the tokens
-        this.refreshUserTokens(this.userTokens.refresh);
-        return "User Tokens refreshed";
-      } else {
-        throw new Error("User tokens invalid: re-authenticate user");
-        // then the user will have to be re-authenticated with a password flow
+    } catch (error) {
+      try {
+        const refreshVerified = this.userTokens.refresh.verifyToken(); 
+        await this.refreshUserTokens(this.userTokens.refresh);
+        return "tokens refreshed";
+      } catch (error) {
+        throw new Error(error);
       }
     }
   }

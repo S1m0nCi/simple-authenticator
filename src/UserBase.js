@@ -33,6 +33,10 @@ class UserBase {
     return this.users;
   }
 
+  setUsers(userObj) {
+    this.users = userObj;
+  }
+
   addUser(username, hashedPassword) {
     if (!(username in this.users)) {
       this.users[username] = {password: hashedPassword};

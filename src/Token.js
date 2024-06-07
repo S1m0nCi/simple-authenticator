@@ -11,12 +11,12 @@ class Token {
   }
 
   verifyToken() {
-    return verify(this.token, process.env.SECRET_KEY, (err, result) => {
-      if (err) {
-        return false;
-      } 
-      return true;      
-    })
+    try {
+      verify(this.token, process.env.SECRET_KEY);
+      return true;
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 }
 
