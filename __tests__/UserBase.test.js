@@ -1,7 +1,7 @@
-const { hash, verify } = require('argon2');
-const { randomBytes } = require('crypto')
+import { hash, verify } from 'argon2';
+import { randomBytes } from 'crypto';
 
-const { UserBase } =  require("../src/UserBase.js");
+import UserBase from "../src/UserBase.js";
 
 
 // first trial test: 

@@ -1,6 +1,6 @@
-const { verify } = require("jsonwebtoken");
+import verify from "jsonwebtoken";
 
-class Token {  
+export default class Token {  
   constructor(token, userBase) {
     this.token = token;
     this.userBase = userBase;
@@ -20,5 +20,5 @@ class Token {
   }
 }
 
-module.exports = { Token };
+//module.exports = { Token };
 

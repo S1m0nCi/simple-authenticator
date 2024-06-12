@@ -1,6 +1,5 @@
 // configures the settings for the user
 /* 
-Sets the secretKey for jwt, for instance: no, we will only have one secret key.
 We would like this to behave similarly to a javascript struct
 it would be best to use an object
 
@@ -11,9 +10,9 @@ idexp
 refreshexp
 */
 
-const { randomBytes } = require("crypto");
+import { randomBytes } from "crypto";
 
-class UserBase {
+export default class UserBase {
 
   static defaultSettings = {
     email: false,
@@ -27,6 +26,8 @@ class UserBase {
   constructor(settings=UserBase.defaultSettings, users={}) {
     this.settings = settings;
     this.users = users;
+    // maybe we should generate a secret here that does not need to be added to a .env file or anything: issue is that the secret
+
   }
 
   getUsers() {
@@ -47,5 +48,5 @@ class UserBase {
   }
 }
 
-module.exports = { UserBase };
+// module.exports = { UserBase };
 

@@ -1,10 +1,10 @@
-const jwt = require("jsonwebtoken");
-require("dotenv").config()
+import jwt from "jsonwebtoken";
+import 'dotenv/config';
 
-const { Token } = require("./Token.js");
+import Token from "./Token.js";
 
 
-class IdToken extends Token {
+export default class IdToken extends Token {
 
   constructor(username, exp) {
     const token = jwt.sign(
@@ -23,4 +23,4 @@ class IdToken extends Token {
  
 }
 
-module.exports = { IdToken };
+//module.exports = { IdToken };

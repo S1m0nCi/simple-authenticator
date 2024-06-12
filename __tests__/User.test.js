@@ -1,8 +1,8 @@
-const { randomBytes } = require("crypto");
-const { verify } = require("argon2")
+import { randomBytes } from "crypto";
+import { verify } from "argon2";
 
-const { User } = require("../src/User.js");
-const { UserBase } = require("../src/UserBase.js");
+import User from "../src/User.js";
+import UserBase from "../src/UserBase.js";
 // we will only use the users.json file in our tests to imitate the user's use of a database or similar
 
 // also test negative cases

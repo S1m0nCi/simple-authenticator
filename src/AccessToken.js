@@ -1,9 +1,9 @@
-const jwt = require("jsonwebtoken");
-require("dotenv").config()
+import jwt from "jsonwebtoken";
+import 'dotenv/config';
 
-const { Token } = require("./Token")
+import Token from "./Token";
 
-class AccessToken extends Token {
+export default class AccessToken extends Token {
   constructor(exp) {
     const token = jwt.sign(
       {
@@ -18,4 +18,4 @@ class AccessToken extends Token {
   }
 }
 
-module.exports = { AccessToken }
+// module.exports = { AccessToken }
