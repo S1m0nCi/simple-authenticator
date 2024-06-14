@@ -1,9 +1,8 @@
 const { verify } = require("jsonwebtoken");
 
 class Token {  
-  constructor(token, userBase) {
+  constructor(token) {
     this.token = token;
-    this.userBase = userBase;
   }
 
   getToken() {

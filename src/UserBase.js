@@ -25,6 +25,7 @@ class UserBase {
 
   // configure authentication settings
   constructor(settings=UserBase.defaultSettings, users={}) {
+    // some input validation may be needed
     this.settings = settings;
     this.users = users;
   }
@@ -39,10 +40,19 @@ class UserBase {
 
   addUser(username, hashedPassword) {
     if (!(username in this.users)) {
-      this.users[username] = {password: hashedPassword};
-      return "User Added successfully"
+      this.users[username] = { password: hashedPassword };
+      return "User added";
     } else {
       throw new Error("username not available");
+    }
+  }
+
+  changeUser(username, hashedPassword) {
+    if (username in this.users) {
+      this.users[username] = { password: hashedPassword };
+      return "User details changed"
+    } else {
+      throw new Error("User does not exist");
     }
   }
 }

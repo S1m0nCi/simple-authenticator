@@ -33,21 +33,25 @@ class User {
       await this.setUserTokens();
       this.userBase.addUser(this.username, this.password);
     } catch (error) {
-      return (error);
+      throw new Error(error);
     }
     // for now, we can use an object or a file: just to ensure that everything works.
     // leaving the addUser function as synchronous for now
   }
-
+  
+  // we will need to check if the username is taken or not
   async changeUsername(newUsername) {
     try {
       await this.authenticateUserTokens();
-      this.username = newUsername;
       // change username in userBase.users object also
-      const { username, ...otherUsers} = this.userBase.users;
-      this.userBase.users = otherUsers;
-      this.userBase.addUser(this.username, this.password);
-      return "username changed successfully"; 
+      if (!(newUsername in this.userBase.users)) {
+        delete this.userBase.users[this.username];
+        this.username = newUsername;
+        this.userBase.addUser(this.username, this.password);
+        return "username changed successfully";
+      } else {
+        throw new Error("username already taken");
+      }
     } catch (error) {
       throw new Error(error);
     }
@@ -97,11 +101,10 @@ class User {
     try {
       await this.authenticateUserTokens();
       await verify(this.password, oldPassword);
-      this.password = newPassword;
+      console.log("changing password now");
+      this.password = await hash(newPassword);
       // change password in userBase.users object also
-      const { username, ...otherUsers} = this.userBase.users;
-      this.userBase.users = otherUsers;
-      this.userBase.addUser(this.username, this.password);
+      this.userBase.changeUser(this.username, this.password);
       return "Password changed successfully";
     } catch (error) {
       throw new Error(error);
@@ -140,7 +143,7 @@ class User {
       return "short-lived tokens valid";
     } catch (error) {
       try {
-        const refreshVerified = this.userTokens.refresh.verifyToken(); 
+        this.userTokens.refresh.verifyToken(); 
         await this.refreshUserTokens(this.userTokens.refresh);
         return "tokens refreshed";
       } catch (error) {
