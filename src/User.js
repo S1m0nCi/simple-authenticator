@@ -88,9 +88,7 @@ class User {
       await verify(this.password, oldPassword);
       this.password = await hash(newPassword);
       // change password in userBase.users object also
-      const { username, ...otherUsers} = this.userBase.users;
-      this.userBase.users = otherUsers;
-      this.userBase.addUser(this.username, this.password);
+      this.userBase.changeUser(this.username, this.password);
       return "Password reset successfully";
     } catch (error) {
       throw new Error(error);
@@ -101,7 +99,6 @@ class User {
     try {
       await this.authenticateUserTokens();
       await verify(this.password, oldPassword);
-      console.log("changing password now");
       this.password = await hash(newPassword);
       // change password in userBase.users object also
       this.userBase.changeUser(this.username, this.password);
@@ -151,6 +148,8 @@ class User {
       }
     }
   }
+
+  // Sign Out Function:
 }
 
 module.exports = { User };

@@ -82,7 +82,6 @@ test("Refresh tokens", async () => {
 })
 
 test("Expect access denied", async () => {
-  console.log("******************************************************");
   const userBase = new UserBase();
   const username = "deny_user";
   const user = new User(username, userBase);
@@ -109,16 +108,12 @@ test("Expect access denied", async () => {
   } catch (error) {
     var testError = error;
   }
-  console.log(testError);
   expect(testError);
   try {
     await user.changePassword(testPassword, newPassword);
   } catch (error) {
     testError = error;
   }
-  console.log(testError);
-  console.log(userBase.getUsers()[username].password);
-  console.log(testPassword)
   expect(testError);
   expect(await verify(userBase.getUsers()[username].password, testPassword)).toBe(true);
   try {
@@ -126,7 +121,44 @@ test("Expect access denied", async () => {
   } catch (error) {
     testError = error;
   }
-  console.log(testError);
   expect(testError);
   expect(user.username).toBe(username);
+})
+
+test("Duplicate usernames", async () => {
+  const userBase = new UserBase();
+  const username = "not_unique_user";
+  const user = new User(username, userBase);
+  const userDup = new User(username, userBase);
+  const testPassword = randomBytes(8).toString("hex");
+  try {
+    await user.signUp(testPassword);
+    var users = userBase.users;
+    await userDup.signUp(testPassword);
+  } catch (error) {}
+  expect(users).toBe(userBase.users);
+  const username2 = "now_unique_user";
+  const user2 = new User(username2, userBase);
+  const otherPassword = randomBytes(8).toString("hex");
+  try {
+    await user2.signUp(otherPassword);
+    await user2.changeUsername(username);
+  } catch (error) {
+    expect(error);
+  }
+  expect(user2.username).toBe(username2);
+})
+
+
+test("Forgot Password", async () => {
+  const userBase = new UserBase();
+  const username = "user_forgot_password";
+  const user = new User(username, userBase);
+  const testPassword = randomBytes(8).toString("hex");
+  const newPassword = randomBytes(8).toString("hex");
+  try { 
+    await user.signUp(testPassword);
+    await user.forgotPassword(testPassword, newPassword); 
+  } catch (error) {} 
+  expect(await verify(userBase.getUsers()[username].password, newPassword)).toBe(true); 
 })
