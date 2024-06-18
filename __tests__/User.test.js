@@ -33,9 +33,16 @@ test("Sign in", async () => {
   const username = "user4";
   const user = new User(username, userBase);
   const testPassword = randomBytes(8).toString("hex");
+  const incorrectPassword = randomBytes(8).toString("hex");
   try {
     await user.signUp(testPassword);
-    var result = await user.signIn(username, testPassword)
+    await user.signIn(incorrectPassword);
+  } catch (error) {
+    var err = error;
+  }
+  expect(err);
+  try {
+    var result = await user.signIn(username, testPassword);
   } catch (error) {
     return (error);
   }
@@ -146,7 +153,7 @@ test("Duplicate usernames", async () => {
   } catch (error) {
     expect(error);
   }
-  expect(user2.username).toBe(username2);
+  expect(user2.getUsername()).toBe(username2);
 })
 
 
@@ -161,4 +168,21 @@ test("Forgot Password", async () => {
     await user.forgotPassword(testPassword, newPassword); 
   } catch (error) {} 
   expect(await verify(userBase.getUsers()[username].password, newPassword)).toBe(true); 
+})
+
+test("Sign Out", async () => {
+  const userBase = new UserBase();
+  const username = "user_sign_out";
+  const user = new User(username, userBase);
+  const testPassword = randomBytes(8).toString("hex");
+  const failPassword = randomBytes(8).toString("hex");
+  try {
+    await user.signUp(testPassword);
+    await user.signOut(testPassword);
+    await user.changePassword(failPassword);
+  } catch (error) {
+    var err = error;
+  }
+  expect(err)
+  expect(await verify(userBase.getUsers()[username].password, testPassword)).toBe(true); 
 })

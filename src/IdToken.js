@@ -3,24 +3,19 @@ require("dotenv").config()
 
 const { Token } = require("./Token.js");
 
-
 class IdToken extends Token {
 
-  constructor(username, exp) {
+  constructor(exp, payload) {
     const token = jwt.sign(
-      {
-        "typ":"id",
-        "username": username,
-      },
+      payload,
       process.env.SECRET_KEY,
       {
         expiresIn: exp,
       }
     );
     super(token);
-    this.username = username;
+    this.username = payload.username;
   }
- 
 }
 
 module.exports = { IdToken };

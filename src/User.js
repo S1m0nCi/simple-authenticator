@@ -110,10 +110,11 @@ class User {
 
   // create a function to store user tokens, may be static
   async setUserTokens() {
+    this.userBase.settings.payload.id.username = this.getUsername();
     this.userTokens = {
-      access: new AccessToken(this.userBase.settings.access_exp),
-      id: new IdToken(this.username, this.userBase.settings.id_exp),
-      refresh: new RefreshToken(this.userBase.settings.refresh_exp)
+      access: new AccessToken(this.userBase.settings.expiry.access, this.userBase.settings.payload.access),
+      id: new IdToken(this.userBase.settings.expiry.id, this.userBase.settings.payload.id),
+      refresh: new RefreshToken(this.userBase.settings.expiry.refresh, this.userBase.settings.payload.refresh)
     };
   }
 
@@ -123,9 +124,10 @@ class User {
   
   // INTERNAL USE ONLY
   async refreshUserTokens(userRefreshToken) {
+    this.userBase.settings.payload.id.username = this.getUsername();
     this.userTokens = {
-      access: new AccessToken(this.userBase.settings.access_exp),
-      id: new IdToken(this.username, this.userBase.settings.id_exp),
+      access: new AccessToken(this.userBase.settings.expiry.access, this.userBase.settings.payload.access),
+      id: new IdToken(this.userBase.settings.expiry.id, this.userBase.settings.payload.id),
       refresh: userRefreshToken
     }
   }
@@ -149,7 +151,22 @@ class User {
     }
   }
 
+  // Internal Use Only
+  invalidateUserTokens() {
+    this.userTokens = {};
+  }
+
   // Sign Out Function:
+  async signOut() {
+    try {
+      // user needs to be signed in to sign out
+      await this.authenticateUserTokens();
+      this.invalidateUserTokens();
+      return "User signed out";
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
 }
 
 module.exports = { User };
