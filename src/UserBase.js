@@ -15,13 +15,28 @@ const { randomBytes } = require("crypto");
 
 class UserBase {
 
+  // email, mobile can be put into userData or optionalUserData. In fact, anything can be added to these.
   static defaultSettings = {
-    email: false,
-    mobile: false,
-    access_exp: "1h",
-    id_exp: "1h",
-    refresh_exp: "30d"
+    expiry: {
+      access: "1h",
+      id: "1h",
+      refresh: "30d"
+    },
+    userData: ["username", "password"],
+    optionalUserData: [],
+    payload: {
+      access: {
+        "typ": "access"
+      },
+      id: {
+        "typ": "id"
+      },
+      refresh: {
+        "typ": "refresh"
+      }
+    }
   }
+  // we can add username to id payload when we create the token.
 
   // configure authentication settings
   constructor(settings=UserBase.defaultSettings, users={}) {

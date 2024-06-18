@@ -4,11 +4,10 @@ require("dotenv").config()
 const { Token } = require("./Token")
 
 class AccessToken extends Token {
-  constructor(exp) {
+  
+  constructor(exp, payload) {
     const token = jwt.sign(
-      {
-        "typ": "access"
-      },
+      payload,
       process.env.SECRET_KEY,
       {
         expiresIn: exp 

@@ -5,11 +5,9 @@ const { Token } = require("./Token.js");
 
 class RefreshToken extends Token {
 
-  constructor(exp) {
+  constructor(exp, payload) {
     const token = jwt.sign(
-      {
-        "typ": "refresh"
-      },
+      payload,
       process.env.SECRET_KEY,
       {
         expiresIn: exp,
